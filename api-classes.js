@@ -195,7 +195,9 @@ class User {
         token: this.loginToken
       }
     });
-    console.log(`added to favorites: `, response);                 
+    console.log(`added to favorites: `, response);
+    // Refresh story list
+    await this.updateStories();                
   }
 
   // Method to remove story from favorites list
@@ -208,6 +210,8 @@ class User {
       }
     });
     console.log(`remove from favorites: `, response);
+    // Refresh story list
+    await this.updateStories();
   }
 
   // Method to determine if a selected story is a favorite
@@ -228,8 +232,20 @@ class User {
           return false;
         }
     })
-    console.log(`(from user method class) isFavorite?  ${isFavorite}`);
+    // console.log(`(from user method class) isFavorite?  ${isFavorite}`);
     return isFavorite;
+  }
+
+  // Refresh user stories after update to API
+  async updateStories() {
+    const res = await axios.get(`${BASE_URL}/users/${this.username}`, {
+      params: {
+        token: this.loginToken
+      }
+    });
+
+    this.favorites = res.data.user.favorites.map(story => new Story(story));
+    this.ownStories = res.data.user.stories.map(story => new Story(story));
   }
 }
 

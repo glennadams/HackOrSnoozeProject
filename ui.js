@@ -102,9 +102,9 @@ $(async function() {
   // *******************************************************************
 
   // Mark an story a user favorite and add to favorites
-  $allStoriesList.on('click', '.fa-star', async function(e) {
+  $allStoriesList.on('click', '.fa-star', async function(evt) {
     // Get story id
-    let storyId = $(e.target).closest('li').attr('id');
+    let storyId = $(evt.target).closest('li').attr('id');
     console.log('favorite story id', storyId);
     if ($(this).hasClass('far')) {
                   $(this).removeClass('far').addClass('fas');
@@ -126,26 +126,28 @@ $(async function() {
     $allStoriesList.show();
     $submitForm.show();
     // Get data from form
-    $submitForm.on('submit', async function() {
+    $submitForm.on('submit', async function(evt) {
+      evt.preventDefault(); // no page refresh
       let author = $('#author').val();
       let title = $('#title').val();
       let url = $('#url').val();
 
       let newStory = {author, title, url};
+      console.log(newStory);
       let addedStory = await storyList.addStory(currentUser, newStory);
 
       let addedStoryHTML = generateStoryHTML(addedStory);
       $allStoriesList.prepend(addedStoryHTML);
       $submitForm.trigger('reset');
       $submitForm.hide('slow');
-      console.log(addedStory);
+      
     })
   })
 
   // Delete an added story
-  $ownStories.on('click', '.fa-trash-alt', async function(e) {
+  $ownStories.on('click', '.fa-trash-alt', async function(evt) {
     console.log('click on remove story button');
-    let storyId = $(e.target).closest('li').attr('id');
+    let storyId = $(evt.target).closest('li').attr('id');
     console.log('Removing story ID: ', storyId);
     await storyList.deleteStory(currentUser, storyId)
   })
@@ -157,13 +159,6 @@ $(async function() {
     getFavoriteStories();
     $favoriteStories.show();
   })
-
-  // $navFavorites.on('click', function() {
-  //   console.log('clicked on favorite stories nav');
-  //   hideElements();
-  //   getFavoriteStories();
-  //   $favoriteStories.show();
-  // })
 
   // Display stories added by currentuser
   $navMyStories.on('click', function() {
@@ -295,9 +290,9 @@ $(async function() {
     // check of story is a favorite upon login
     if (currentUser) {
       let isFavorite = currentUser.isStoryFavorite(story.storyId);
-      console.log(`(from ui.js)isFavorite? ${isFavorite}`);
+      // console.log(`(from ui.js)isFavorite? ${isFavorite}`);
       starType = isFavorite ? 'fas' : 'far';
-      console.log(`'Star Class set to ${starType} for ${story.title}`);
+      // console.log(`'Star Class set to ${starType} for ${story.title}`);
     }
     // render story markup
     const storyMarkup = $(`
